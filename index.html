@@ -108,6 +108,11 @@
   .rank-good { background: rgba(46,160,90,0.25); color: #4ade80; }
   .rank-mid { background: rgba(180,150,40,0.25); color: #eab308; }
   .rank-bad { background: rgba(180,50,50,0.25); color: #f87171; }
+  .pace-proj { font-family: 'IBM Plex Mono', monospace; font-size: 15px; color: var(--bone-dim); margin-bottom: 14px; }
+  .pace-proj b { color: var(--bone); font-weight: 600; }
+  .pace-grid .cont-pair { gap: 12px; }
+  .pace-grid .cont-pair .who { font-size: 14.5px; text-align: right; }
+  @media (max-width: 640px) { .pace-grid { grid-template-columns: 1fr; } }
   .cont-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 4px; padding: 16px 18px; }
   .cont-card .label { font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; color: var(--bone-faint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
   .cont-pair { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
@@ -276,7 +281,7 @@ function renderFullGame(g, id) {
     <div class="mono" style="font-size:11.5px; color:var(--bone-faint); margin-top:14px;">${esc(g.tally.away_text)} · ${esc(g.tally.home_text)}</div>
     <div class="section-label">Last 5 Games</div>
     <div class="l5-grid">${renderLast5(g.last5_away)}${renderLast5(g.last5_home)}</div>
-    ${g.pace && g.pace.length ? `<div class="section-label">Pace &amp; Scoring Efficiency</div>${g.pace_projection ? `<div class="mono" style="font-size:12.5px; margin-bottom:8px;">Pace-based projected total: <b>${g.pace_projection.total.toFixed(1)}</b> · about ${g.pace_projection.possessions.toFixed(1)} possessions per team at ${g.pace_projection.sec_per_play.toFixed(1)} sec/play</div>` : ""}<div class="continuity-grid">${g.pace.map(r => renderPaceCard(r, g.away, g.home)).join("")}</div>` : ""}
+    ${g.pace && g.pace.length ? `<div class="section-label">Pace &amp; Scoring Efficiency</div>${g.pace_projection ? `<div class="pace-proj">Pace-based projected total: <b>${g.pace_projection.total.toFixed(1)}</b> · about ${g.pace_projection.possessions.toFixed(1)} possessions per team at ${g.pace_projection.sec_per_play.toFixed(1)} sec/play</div>` : ""}<div class="continuity-grid pace-grid">${g.pace.map(r => renderPaceCard(r, g.away, g.home)).join("")}</div>` : ""}
     <div class="section-label">Roster Continuity</div>
     <div class="continuity-grid">${g.continuity.map(r => renderContinuityCard(r, g.away, g.home)).join("")}</div>
     ${g.h2h_history && g.h2h_history.length ? `<div class="section-label">Head-to-Head History</div>${g.h2h_history.map(m => `<div class="mono" style="font-size:12px; padding:4px 0;">${esc(m)}</div>`).join("")}` : ""}
@@ -292,16 +297,16 @@ function renderPartialGame(g, id) {
   return `<div class="game" id="${id}">
     <div class="g-eyebrow">${weekLabel} · One-sided data</div>
     <div class="matchup"><h2 class="display">${esc(g.away)} <span class="at">at</span> ${esc(g.home)}</h2></div>
-    <div class="market-line">${esc(g.home)} ${g.market_spread} · O/U ${g.market_total} <span class="ml">${esc(g.moneyline || "")}</span></div>
+    <div class="market-line">${g.market_spread === null || g.market_spread === undefined ? "No line posted yet" : `${esc(g.home)} ${g.market_spread} · O/U ${g.market_total} <span class="ml">${esc(g.moneyline || "")}</span>`}</div>
     ${renderWeather(g.weather)}
     <div class="section-label">Last 5 Games</div>
     <div class="l5-grid">${renderLast5(g.last5_away)}${renderLast5(g.last5_home)}</div>
-    <div class="onesided-banner"><div class="tag">No pick made</div><p>${esc(g.onesided_note)}</p></div>
-    <div class="section-label">${esc(g.known_team)} — Season Profile</div>
+    <div class="onesided-banner"><div class="tag">No pick made</div><p>${esc(g.onesided_note || "No betting line has been posted for this game yet. Check back closer to kickoff.")}</p></div>
+    ${g.known_team && (g.season_profile.offense.length || g.season_profile.defense.length) ? `<div class="section-label">${esc(g.known_team)} — Season Profile</div>
     <div class="solo-profile">
       <div class="solo-col"><div class="solo-label">Offense</div>${off}</div>
       <div class="solo-col"><div class="solo-label">Defense</div>${def}</div>
-    </div>
+    </div>` : ""}
     ${g.case_notes.length ? `<div class="section-label">Case Notes</div>${g.case_notes.map(renderNote).join("")}` : ""}
     <div class="footer"><p>${PARTIAL_FOOTER_TEXT}</p></div>
   </div>`;
