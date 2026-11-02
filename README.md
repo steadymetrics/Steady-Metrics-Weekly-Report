@@ -1,2 +1,2 @@
-# Steady-Metrics-Weekly-Report
+# CFB Weekly Report
 Data Driven CFB Matchup Comparisons
